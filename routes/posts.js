@@ -12,8 +12,8 @@ import {
     getLog,
     updateProfile,
     emailCheck,
-    // updateFriendList, 
-    // getFriendsList 
+    updateFriendList, 
+    getFriendsList 
 } from '../controllers/posts.js';
 import { migrationExcel } from '../controllers/migration.js';
 const router = express.Router();
@@ -25,9 +25,9 @@ router.post('/getUser',getUser)
 //get all user list
 router.post('/getUser/list',getUserList)
 
-// //update friend list
-// router.post('/friendList/update',updateFriendList)
-// router.post('/friends/list',getFriendsList)
+//update friend list
+router.post('/friendList/update',updateFriendList)
+router.post('/friends/list',getFriendsList)
 
 
 //New User insert api

@@ -100,61 +100,62 @@ export const updateProfile = async (req, res) => {
     return res.status(409).json({ message: "User Not Found" });
   }
 };
-// //update usersFriendList
-// export const updateFriendList = async (req, res) => {
-//   const userId = req.body.userId;
-//   const friendId = req.body.friendId;
-//   const friendName = req.body.friendName;
+//update usersFriendList
+export const updateFriendList = async (req, res) => {
+  const userId = req.body.userId;
+  const friendId = req.body.friendId;
+  const friendName = req.body.friendName;
 
-//   const updateFriend = UserSchema.findOneAndUpdate(
-//     {
-//       user_id: userId,
-//     },
-//     {
-//       $push: {
-//         friendsList: { friendId: friendId, friendName: friendName },
-//       },
-//     },
-//     (error, doc) => {
-//       if (error) {
-//         return res.status(409).json({ message: error.message });
-//       } else {
-//         return res.status(201).json(doc);
-//       }
-//     }
-//   );
-// };
+  const updateFriend = UserSchema.findOneAndUpdate(
+    {
+      user_id: userId,
+    },
+    {
+      $push: {
+        friendsList: { friendId: friendId, friendName: friendName },
+      },
+    },
+    (error, doc) => {
+      if (error) {
+        return res.status(409).json({ message: error.message });
+      } else {
+        return res.status(201).json(doc);
+      }
+    }
+  );
+};
 
-// // all user
-// export const getFriendsList = async (req, res) => {
-//     console.log(req.body);
+// all user
+export const getFriendsList = async (req, res) => {
+    console.log(req.body);
 
-//     const userId = req.body.userId;
+    const userId = req.body.userId;
 
-//     let userData = await UserSchema.aggregate([
-//       {
-//         $match: {
-//           $expr: {
-//             $eq: ["$user_id", userId],
-//           },
-//         },
-//       },
-//       {
-//         $project: {
-//           friendsList:1,
-//           _id: 0,
-//         },
-//       },
-//     ]);
+    let userData = await UserSchema.aggregate([
+      {
+        $match: {
+          $expr: {
+            $eq: ["$user_id", userId],
+          },
+        },
+      },
+      {
+        $project: {
+          friendsList:1,
+          _id: 0,
+        },
+      },
+    ]);
 
-//     if (userData) {
-//       return res.status(201).send({ userData });
-//     } else {
-//       return res.status(409).json({ message: "Data Not Found" });
-//     }
-//   };
+    if (userData) {
+      return res.status(201).send({ userData });
+    } else {
+      return res.status(409).json({ message: "Data Not Found" });
+    }
+  };
 
-//New SignUp
+// New SignUp
+
 export const insertUser = async (req, res) => {
   console.log("req=>", req.body);
   const post = req.body;
