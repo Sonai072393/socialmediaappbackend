@@ -46,6 +46,54 @@ export const getUserList = async (req, res) => {
         _id: 0,
       },
     },
+
+    {
+      $lookup: {
+        from: "00_users",
+        let: { userId: "$user_id" },
+        pipeline: [
+          {
+            $unwind: "$friendsList",
+          },
+
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: [userId, "$user_id"] },
+                  { $eq: ["$friendsList.friendId", "$$userId"] }
+                ],
+              },
+            },
+          },
+
+          {
+            $project: {
+              status: {
+                $cond: {
+                  if: { $eq: ["$friendsList.friendId", "$$userId"] },
+                  then: true,
+                  else: false,
+                },
+              },
+            },
+          },
+        ],
+        as: "stat",
+      },
+    },
+    {
+      $addFields:{
+        status:{
+          // $size:"$stat.status"
+          $cond:{
+            if:{$gt:[{$size:"$stat"},0]},
+            then:{$first:"$stat.status"},
+            else:false
+          }
+        }
+      }
+    }
   ]);
 
   console.log("reached", userData);
@@ -127,32 +175,32 @@ export const updateFriendList = async (req, res) => {
 
 // all user
 export const getFriendsList = async (req, res) => {
-    console.log(req.body);
+  console.log(req.body);
 
-    const userId = req.body.userId;
+  const userId = req.body.userId;
 
-    let userData = await UserSchema.aggregate([
-      {
-        $match: {
-          $expr: {
-            $eq: ["$user_id", userId],
-          },
+  let userData = await UserSchema.aggregate([
+    {
+      $match: {
+        $expr: {
+          $eq: ["$user_id", userId],
         },
       },
-      {
-        $project: {
-          friendsList:1,
-          _id: 0,
-        },
+    },
+    {
+      $project: {
+        friendsList: 1,
+        _id: 0,
       },
-    ]);
+    },
+  ]);
 
-    if (userData) {
-      return res.status(201).send({ userData });
-    } else {
-      return res.status(409).json({ message: "Data Not Found" });
-    }
-  };
+  if (userData) {
+    return res.status(201).send({ userData });
+  } else {
+    return res.status(409).json({ message: "Data Not Found" });
+  }
+};
 
 // New SignUp
 
@@ -332,7 +380,7 @@ export const emailCheck = async (req, res) => {
       },
     },
   ]);
-  if (user_data.length>0) {
+  if (user_data.length > 0) {
     return res.status(201).send(user_data);
   } else {
     return res.status(409).json({ message: "User Not Found" });
